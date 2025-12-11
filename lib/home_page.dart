@@ -1,79 +1,124 @@
 import 'package:flutter/material.dart';
+import 'models/tarefa_model.dart';
 import 'tres_campos_page.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
+class HomePage extends StatefulWidget {
   final String title;
 
+  const HomePage({super.key, required this.title});
+
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  final List<Map<String, String>> _itens = []; // lista com os dados vindos da outra tela
+class _HomePageState extends State<HomePage> {
+  final List<TarefaModel> _tarefas = [];
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void _adicionarTarefa() async {
+    final novaTarefa = await Navigator.push<TarefaModel>(
+      context,
+      MaterialPageRoute(builder: (context) => const TresCamposPage()),
+    );
+
+    if (novaTarefa != null) {
+      setState(() {
+        _tarefas.add(novaTarefa);
+      });
+    }
   }
 
-  Future<void> _abrirTresCampos() async {
-    final resultado = await Navigator.push(
+  void _editarTarefa(int index) async {
+    final tarefaAtual = _tarefas[index];
+
+    final tarefaEditada = await Navigator.push<TarefaModel>(
       context,
       MaterialPageRoute(
-        builder: (_) => const TresCamposPage(),
+        builder: (context) => TresCamposPage(
+          tarefaExistente: tarefaAtual,
+        ),
       ),
     );
 
-    if (resultado != null && resultado is Map<String, String>) {
+    if (tarefaEditada != null) {
       setState(() {
-        _itens.add(resultado);
+        _tarefas[index] = tarefaEditada;
       });
     }
+  }
+
+  void _confirmarRemocao(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Confirmar exclusão"),
+          content: const Text("Tem certeza que deseja excluir este item?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: const Text(
+                "Excluir",
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                setState(() => _tarefas.removeAt(index));
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text('Itens salvos:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Expanded(
-              child: _itens.isEmpty
-                  ? const Center(child: Text('Nenhum item salvo ainda'))
-                  : ListView.builder(
-                      itemCount: _itens.length,
-                      itemBuilder: (context, index) {
-                        final item = _itens[index];
-                        return Card(
-                          child: ListTile(
-                            title: Text(item['campo1'] ?? ''),
-                            subtitle: Text(
-                                '${item['campo2'] ?? ''} — ${item['campo3'] ?? ''}'),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+        centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _abrirTresCampos, // abre a tela dos 3 campos
-        tooltip: 'Adicionar novo item',
+        onPressed: _adicionarTarefa,
         child: const Icon(Icons.add),
       ),
+      body: _tarefas.isEmpty
+          ? const Center(
+              child: Text(
+                "Nenhum carro cadastrado",
+                style: TextStyle(fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: _tarefas.length,
+              itemBuilder: (context, index) {
+                final tarefa = _tarefas[index];
+
+                return Card(
+                  margin: const EdgeInsets.all(12),
+                  child: ListTile(
+                    title: Text(
+                      "${tarefa.carro} - ${tarefa.modelo}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      "Ano: ${tarefa.ano}\n"
+                      "Placa: ${tarefa.placa}\n"
+                      "Cor: ${tarefa.cor}\n"
+                      "Revisado: ${tarefa.revisado ? "Sim" : "Não"}",
+                    ),
+                    onTap: () => _editarTarefa(index),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _confirmarRemocao(index),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

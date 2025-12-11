@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/home_page.dart';
+import 'home_page.dart';
 
-
-
-
-class MyApp extends StatelessWidget 
-{
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) 
-{
+  Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'App de Carros',
       theme: ThemeData(
-        
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(title: "Lista de Carros"),
     );
   }
 }
