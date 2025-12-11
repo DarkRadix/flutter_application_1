@@ -1,5 +1,5 @@
 class TarefaModel {
-  final int id;
+  final String id;
   final String carro;
   final String modelo;
   final int ano;
@@ -18,4 +18,31 @@ class TarefaModel {
     required this.revisado,
     required this.dataCriacao,
   });
+
+  factory TarefaModel.fromJson(Map<String, dynamic> json) {
+    return TarefaModel(
+      id: json["id"].toString(),
+      carro: json["carro"],
+      modelo: json["modelo"],
+      ano: int.parse(json["ano"].toString()),
+      placa: json["placa"],
+      cor: json["cor"],
+      revisado: json["revisado"] == true,
+      dataCriacao: json["dataCriacao"] != null
+          ? DateTime.parse(json["dataCriacao"])
+          : DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "carro": carro,
+      "modelo": modelo,
+      "ano": ano,
+      "placa": placa,
+      "cor": cor,
+      "revisado": revisado,
+      "dataCriacao": dataCriacao.toIso8601String(),
+    };
+  }
 }

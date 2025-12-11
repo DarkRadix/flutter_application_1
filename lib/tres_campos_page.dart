@@ -25,28 +25,18 @@ class _TresCamposPageState extends State<TresCamposPage> {
   void initState() {
     super.initState();
 
-    carroController =
-        TextEditingController(text: widget.tarefaExistente?.carro ?? "");
-
-    modeloController =
-        TextEditingController(text: widget.tarefaExistente?.modelo ?? "");
-
-    anoController = TextEditingController(
-        text: widget.tarefaExistente?.ano.toString() ?? "");
-
-    placaController =
-        TextEditingController(text: widget.tarefaExistente?.placa ?? "");
-
-    corController =
-        TextEditingController(text: widget.tarefaExistente?.cor ?? "");
-
+    carroController = TextEditingController(text: widget.tarefaExistente?.carro ?? "");
+    modeloController = TextEditingController(text: widget.tarefaExistente?.modelo ?? "");
+    anoController = TextEditingController(text: widget.tarefaExistente?.ano.toString() ?? "");
+    placaController = TextEditingController(text: widget.tarefaExistente?.placa ?? "");
+    corController = TextEditingController(text: widget.tarefaExistente?.cor ?? "");
     revisado = widget.tarefaExistente?.revisado ?? false;
   }
 
   void _salvar() {
     if (_formKey.currentState!.validate()) {
-      final novaTarefa = TarefaModel(
-        id: widget.tarefaExistente?.id ?? DateTime.now().millisecondsSinceEpoch,
+      final tarefa = TarefaModel(
+        id: widget.tarefaExistente?.id ?? "0",
         carro: carroController.text,
         modelo: modeloController.text,
         ano: int.parse(anoController.text),
@@ -56,7 +46,7 @@ class _TresCamposPageState extends State<TresCamposPage> {
         dataCriacao: widget.tarefaExistente?.dataCriacao ?? DateTime.now(),
       );
 
-      Navigator.pop(context, novaTarefa);
+      Navigator.pop(context, tarefa);
     }
   }
 
@@ -64,9 +54,7 @@ class _TresCamposPageState extends State<TresCamposPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.tarefaExistente == null
-            ? "Novo Cadastro"
-            : "Editar Cadastro"),
+        title: Text(widget.tarefaExistente == null ? "Novo Cadastro" : "Editar Cadastro"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -77,14 +65,12 @@ class _TresCamposPageState extends State<TresCamposPage> {
               TextFormField(
                 controller: carroController,
                 decoration: const InputDecoration(labelText: "Carro"),
-                validator: (v) =>
-                    v == null || v.isEmpty ? "Informe o carro" : null,
+                validator: (v) => v!.isEmpty ? "Informe o carro" : null,
               ),
               TextFormField(
                 controller: modeloController,
                 decoration: const InputDecoration(labelText: "Modelo"),
-                validator: (v) =>
-                    v == null || v.isEmpty ? "Informe o modelo" : null,
+                validator: (v) => v!.isEmpty ? "Informe o modelo" : null,
               ),
               TextFormField(
                 controller: anoController,
@@ -92,34 +78,30 @@ class _TresCamposPageState extends State<TresCamposPage> {
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   if (v == null || v.isEmpty) return "Informe o ano";
-                  if (!RegExp(r'^\d{4}$').hasMatch(v)) {
-                    return "Ano inválido (use 4 dígitos)";
-                  }
+                  if (!RegExp(r'^\d{4}$').hasMatch(v)) return "Ano inválido";
                   return null;
                 },
               ),
               TextFormField(
                 controller: placaController,
                 decoration: const InputDecoration(labelText: "Placa"),
-                validator: (v) =>
-                    v == null || v.isEmpty ? "Informe a placa" : null,
+                validator: (v) => v!.isEmpty ? "Informe a placa" : null,
               ),
               TextFormField(
                 controller: corController,
                 decoration: const InputDecoration(labelText: "Cor"),
-                validator: (v) =>
-                    v == null || v.isEmpty ? "Informe a cor" : null,
+                validator: (v) => v!.isEmpty ? "Informe a cor" : null,
               ),
               SwitchListTile(
-                title: const Text("Revisado"),
                 value: revisado,
                 onChanged: (v) => setState(() => revisado = v),
+                title: const Text("Revisado"),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _salvar,
                 child: const Text("Salvar"),
-              )
+              ),
             ],
           ),
         ),
